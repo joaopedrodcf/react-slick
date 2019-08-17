@@ -16,20 +16,20 @@ import js_beautify, { html as html_beautify } from "js-beautify";
 function simulateActions(actions) {
   if (actions.clickNext) {
     for (let click = 0; click < actions.clickNext; click++) {
-      $(".slick-next").click();
+      simulateClick("slick-next");
     }
   }
   if (actions.clickPrev) {
     for (let click = 0; click < actions.clickPrev; click++) {
-      $(".slick-prev").click();
+      simulateClick("slick-prev");
     }
   }
   if (actions.clickSequence) {
     for (let click of actions.clickSequence) {
       if (click === "n") {
-        $(".slick-next").click();
+        simulateClick("slick-next");
       } else if (click === "p") {
-        $(".slick-prev").click();
+        simulateClick("slick-prev");
       } else {
         // that's right, you can't even write n/p properly
       }
@@ -49,26 +49,25 @@ function fetchDetails(keys) {
     allSlides = [],
     clonedSlides = [],
     visibleSlides = [];
-  for (let slide of $("div.slick-slide")) {
+  for (let slide of document.querySelectorAll("div.slick-slide")) {
     const slideObj = {
-      index: $(slide).attr("data-slick-index"),
-      value: $(slide)
-        .find("div")
-        .find("div")
-        .find("h3")
-        .text()
+      index: slide.getAttribute("data-slick-index"),
+      value: slide
+        .querySelectorAll("div")[0]
+        .querySelectorAll("div")[0]
+        .querySelectorAll("h3")[0].textContent
     };
     allSlides.push(slideObj);
-    if ($(slide).hasClass("slick-current")) {
+    if (slide.classList.contains("slick-current")) {
       currentSlide = slideObj.index;
     }
-    if ($(slide).hasClass("slick-active")) {
+    if (slide.classList.contains("slick-active")) {
       activeSlides.push(slideObj);
     }
-    if ($(slide).hasClass("slick-cloned")) {
+    if (slide.classList.contains("slick-cloned")) {
       clonedSlides.push(slideObj);
     }
-    if ($(slide).attr("aria-hidden") == "false") {
+    if (slide.getAttribute("aria-hidden") == "false") {
       visibleSlides.push(slideObj);
     }
   }
@@ -131,3 +130,9 @@ test("testing getJQuerySlickDetails utility", () => {
   const details = getJQuerySlickDetails(settings, actions, keys);
   expect(details.activeSlides).toEqual(details.visibleSlides);
 });
+
+function simulateClick(classname) {
+  const element = document.getElementsByClassName(classname)[0];
+  element.addEventListener("click", () => {});
+  element.click();
+}
